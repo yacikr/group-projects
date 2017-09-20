@@ -58,7 +58,7 @@ public class readAndCompare {
 	}
 	
 	/**
-	 * Checks to see if a word is alphabetical.
+	 * Checks to see if a word is made of alphabetical elements.
 	 * @param currentWord
 	 * @return
 	 */
