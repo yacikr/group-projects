@@ -1,50 +1,120 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class readAndCompare {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
+		System.out.println("Enter path to file: ");
 		
-		try {
-			Scanner dictionary = new Scanner(new File("./Dictionary.txt"));
-			Scanner readFile = new Scanner(new File("./File.txt"));
-			ResizableArrayBag<String> dictionaryBag = new ResizableArrayBag<String>();
-			String currentWord = "";
-			
-			// TODO: Put the dictionary into the bag ADT here
-			
-			// Checking if the read word is in the bag:
-			char currentWordChar;
-			boolean wasPreviousStringPunctuation = true;
-			
-			while(readFile.hasNext()) {
-				currentWord = readFile.next();
-				currentWordChar = currentWord.charAt(0);
-				
-				if(isPunctuation(currentWordChar)) {
-					wasPreviousStringPunctuation = true;
-				}
+		Scanner userIn = new Scanner(System.in);
+		String userInput = userIn.nextLine();
+		userIn.close();
+		
+		doReadAndCompare(userInput);
+	}
+	public static void doReadAndCompare(String readFileString) throws FileNotFoundException {
+		String dictionaryWordSource = "american-english-JL.txt"; //variable for accessing dictionary file
+		
+		checkIfValidFile(dictionaryWordSource);
+		checkIfValidFile(readFileString);
 
-				// (If it's alphabetical), or  (if it's capitalized and following punctuation), then it needs to be checked. 
-				else if(isAlphabetical(currentWord) || (wasPreviousStringPunctuation && isCapitalized(currentWordChar))) {
-					if(!dictionaryBag.contains(currentWord)) {
-					/* TODO: Handle the not having a word thing
-					 * - Add it to the bag (if not already in there)
-					 */ 
+		Scanner readFile = new Scanner(new File(readFileString));
+
+        String lineReader = null; //reference one line at a time
+
+        //creates the bag object for storing the dictionary strings
+        ResizableArrayBag<String> dictionary = new ResizableArrayBag<String>();
+        ResizableArrayBag<String> misspelledBag = new ResizableArrayBag<String>();
+
+        try
+        {
+            //creates file reader to process the dictionary source
+            FileReader fileReader = new FileReader(dictionaryWordSource);
+
+            //wraps the file reader in a buffer reader
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            //loop through all the lines in the dictionary file
+            while ((lineReader = bufferedReader.readLine()) != null)
+            {
+                //can the current string can be added to bag?
+                if (dictionary.add(lineReader))
+                {
+
+                    //if not; print error
+                } else
+                {
+                    System.out.println("Unable to add to bag object");
+                }   //end if
+            }   //end while
+        }   //end try
+
+        //throw exception if dictionary source file is unable to be found
+        catch (FileNotFoundException ex)
+        {
+            System.out.println("Unable to locate file '"+dictionaryWordSource+"'");
+        }
+
+        //throw exception if there is error reading dictionary source file
+        catch (IOException ex)
+        {
+            System.out.println("Error reading file '"+dictionaryWordSource+"'");
+        }
+		
+		
+		// TODO: Put the dictionary into the bag ADT here
+		
+		// Checking if the read word is in the bag:
+        String currentWord = "";
+		char currentWordChar;
+		int nonAlphabeticalCount = 0;
+		int capitalizedCount = 0;
+		while(readFile.hasNext()) {
+			
+			currentWord = readFile.next();
+			currentWord = removeTerminatingPunctuation(currentWord);
+			currentWordChar = currentWord.charAt(0);
+
+			/* 
+			 * If it's alphabetical and not capitalized, then it needs to be checked.
+			 * This means that numbers and other characters will be ignored. 
+			 */
+			if(!isAlphabetical(currentWord)) {
+				++nonAlphabeticalCount;
+			} else if (isCapitalized(currentWordChar)) {
+				++capitalizedCount;
+			} else {
+				if(!dictionary.contains(currentWord)) {
+					if(!misspelledBag.contains(currentWord)) {
+						misspelledBag.add(currentWord);
 					}
-					wasPreviousStringPunctuation = false;
 				}
 			}
-			
-			dictionary.close();
-			readFile.close();
-			
-			/* TODO: Inform the user about the whole thing
-			 * - Read from the array 
-			 */
-			
-		} catch (FileNotFoundException e) {
-			System.out.println("Sorry, couldn't find that file. Please check your path before trying again.");
+		}
+		
+		System.out.println("The following words are misspelled in "+readFileString+" according to "+dictionaryWordSource+":");
+		System.out.println(Arrays.toString(misspelledBag.toArray()));
+		System.out.println("Ignored: "+nonAlphabeticalCount+" non-alphabetical words, and "+capitalizedCount+" capitalized words");
+
+		
+	}
+
+	private static String removeTerminatingPunctuation(String currentWord) {
+		if(isPunctuation(currentWord.charAt(currentWord.length()-1))) {
+			return currentWord.substring(0, currentWord.length()-1); // Remove last character, if it's punctuation
+		}
+		return currentWord;
+	}
+	
+	private static void checkIfValidFile(String fileRead) {
+		File f = new File(fileRead);
+		if(!f.isFile()) {
+			System.out.println("File not found: "+fileRead+"\nCheck your path and try again.");
+			System.exit(1);
 		}
 		
 	}
@@ -54,7 +124,12 @@ public class readAndCompare {
 	}
 
 	private static boolean isPunctuation(char currentWordChar) {
-		return currentWordChar == '.' || currentWordChar == ';' || currentWordChar == '!' || currentWordChar == '?' || currentWordChar == ':';
+		return currentWordChar == '.' ||
+				currentWordChar == ';' ||
+				currentWordChar == '!' ||
+				currentWordChar == '?' ||
+				currentWordChar == ':' ||
+				currentWordChar == ',';
 	}
 	
 	/**
