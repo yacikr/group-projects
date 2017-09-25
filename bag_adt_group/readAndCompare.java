@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,27 +84,37 @@ public class readAndCompare {
 		
 		// Checking if the read word is in the bag:
         String currentWord = "";
+        String currentWordTrimmed = "";
+        String previousWord = "";
 		char currentWordChar;
 		int nonAlphabeticalCount = 0;
 		int capitalizedCount = 0;
+		boolean wasPreviousStringPunctuated = true;
+		
 		while(readFile.hasNext()) {
 			
+			previousWord = currentWord;
+			
+			if(previousWord.length() > 1) {
+				wasPreviousStringPunctuated = isPunctuation( previousWord.charAt(previousWord.length()-1) );
+			}
+
 			currentWord = readFile.next();
-			currentWord = removeTerminatingPunctuation(currentWord);
+			currentWordTrimmed = removeTerminatingPunctuation(currentWord);
 			currentWordChar = currentWord.charAt(0);
 
 			/* 
-			 * If it's alphabetical and not capitalized, then it needs to be checked.
+			 * If it's alphabetical or if it's not (capitalized and not following punctuation), then it needs to be checked.
 			 * This means that numbers and other characters will be ignored. 
 			 */
-			if(!isAlphabetical(currentWord)) {
+			if(!isAlphabetical(currentWordTrimmed)) {
 				++nonAlphabeticalCount;
-			} else if (isCapitalized(currentWordChar)) {
+			} else if (isCapitalized(currentWordChar) && !wasPreviousStringPunctuated) {
 				++capitalizedCount;
 			} else {
-				if(!dictionary.contains(currentWord)) {
-					if(!misspelledBag.contains(currentWord)) {
-						misspelledBag.add(currentWord);
+				if(!dictionary.contains(currentWordTrimmed.toLowerCase())) {
+					if(!misspelledBag.contains(currentWordTrimmed)) {
+						misspelledBag.add(currentWordTrimmed);
 					}
 				}
 			}
