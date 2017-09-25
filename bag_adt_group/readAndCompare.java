@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -5,6 +6,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.Arrays;
+
+/**
+ * 
+ * @author Chris Thierauf: Handled the comparison stuff
+ * @author Shawn Toubeau: Handled the input stuff
+ * @author Roman Yacik: Handled the output stuff
+ * 
+ * COMP-2000
+ * bag-adt-group
+ * Due September 25th
+ * 
+ * Reads and compares the words in the dictionary file and the given file to act as a spell-checker.
+ *
+ */
 
 public class readAndCompare {
 	public static void main(String[] args) throws FileNotFoundException {
