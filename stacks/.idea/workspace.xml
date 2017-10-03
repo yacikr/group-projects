@@ -10,7 +10,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="takeInput.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/takeInput.java">
           <provider selected="true" editor-type-id="text-editor">
